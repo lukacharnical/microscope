@@ -1,0 +1,190 @@
+```html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Microscope USB Viewer</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: white;
+    text-align: center;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+
+video, canvas {
+    width: 80%;
+    max-height: 500px;
+    background: black;
+    border: 3px solid #444;
+}
+
+.controls {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+button, input {
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+}
+
+button {
+    background: #2196f3;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0d8ae0;
+}
+
+label {
+    background: #333;
+    padding: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🔬 Microscope USB Viewer</h1>
+
+<video id="video" autoplay></video>
+
+<div class="controls">
+
+<button onclick="connectCamera()">📷 Connecter microscope</button>
+
+<button onclick="takePicture()">📸 Capture</button>
+
+<button onclick="toggleZoom()">🔍 Zoom</button>
+
+<button onclick="rotateImage()">🔄 Rotation</button>
+
+<label>
+Luminosité
+<input type="range" id="brightness" min="50" max="200" value="100">
+</label>
+
+<label>
+Contraste
+<input type="range" id="contrast" min="50" max="200" value="100">
+</label>
+
+</div>
+
+<br>
+
+<canvas id="canvas"></canvas>
+
+</div>
+
+
+<script>
+
+let video = document.getElementById("video");
+let canvas = document.getElementById("canvas");
+let ctx = canvas.getContext("2d");
+
+let zoom = 1;
+let rotation = 0;
+
+
+// Connexion microscope USB
+async function connectCamera(){
+
+try {
+
+let stream = await navigator.mediaDevices.getUserMedia({
+video:{
+width:1920,
+height:1080
+}
+});
+
+video.srcObject = stream;
+
+}
+
+catch(error){
+
+alert("Impossible de trouver le microscope USB");
+
+}
+
+}
+
+
+// Capture image
+function takePicture(){
+
+canvas.width = video.videoWidth;
+canvas.height = video.videoHeight;
+
+ctx.drawImage(video,0,0);
+
+}
+
+
+// Zoom
+function toggleZoom(){
+
+zoom += 0.5;
+
+if(zoom > 3)
+zoom = 1;
+
+video.style.transform =
+`scale(${zoom}) rotate(${rotation}deg)`;
+
+}
+
+
+// Rotation
+function rotateImage(){
+
+rotation += 90;
+
+video.style.transform =
+`scale(${zoom}) rotate(${rotation}deg)`;
+
+}
+
+
+// Réglages image
+
+document.getElementById("brightness")
+.oninput=function(){
+
+video.style.filter =
+`brightness(${this.value}%) contrast(${document.getElementById("contrast").value}%)`;
+
+}
+
+
+document.getElementById("contrast")
+.oninput=function(){
+
+video.style.filter =
+`brightness(${document.getElementById("brightness").value}%) contrast(${this.value}%)`;
+
+}
+
+</script>
+
+</body>
+</html>
+```
